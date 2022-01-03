@@ -32,10 +32,12 @@ Each category has a number associated with it, and when you add a folder, you mu
 Do not add a trailing slash.
 
 Example:
+```
 {
     "root":"C:/Path/To/Movies",
     "category":0
 }
+```
 
 After adding your folders, you can initialize a scan by visiting the /manager/scan endpoint ( Default: http://localhost:8000/manager/scan )
 

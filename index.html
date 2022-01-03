@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PFlix - Viewer</title>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="menu">
+      <div><button class="active" id="btn-movies" onclick="java:getMovies();">Movies</button><button id="btn-tv" onclick="java:getTV();">TV</button><button onClick="window.open('/librarymanager.html','_self');">Library Manager</button></div>
+    </div>
+
+    <div id="library" class="hero-container">
+      
+    </div>
+
+    <div id="video-window" class="video is-hidden">
+      <button id="video-close">X</button>
+      <video id="rpiediaPlayer" width="650" controls muted="muted" autoplay>
+        <source id="rpiediaSource"/>
+      </video>
+    </div>
+    <script type="application/javascript">
+      $(document).ready(function() {
+        // Create List of Movies
+        fetch('/manager/medialist')
+        .then(r=>r.json())
+        .then(json=> {
+          $('#btn-tv').removeClass('active');
+          $('#btn-movies').addClass('active');
+          $('#library').html("")
+          content = ''
+          for(var key in json) {
+            if(json[key].category == "Movies") {
+              var id = json[key].id
+              var title = json[key].title
+              var poster = json[key].poster
+              if(poster == undefined) {
+                poster = "https://picsum.photos/200/300"
+              }
+              content = content + "<div class=\"video-container\">"
+              content = content + "<div class=\"video-poster\">"
+              content = content + "<img src=\""+poster+"\" onClick=\"loadMedia("+id+");\"/>"
+              content = content + "</div>"
+              content = content + "<div class=\"video-title\">"+title+"</div>"
+              content = content + "<div class=\"video-title\"></div>"
+              content = content + "</div>"
+            }
+          }
+          $("#library").append(content)
+        })
+        $("#video-close").click(function(event) {
+          event.preventDefault();
+          $('#rpiediaPlayer').get(0).pause();
+          $("#video-window").addClass("is-hidden");
+        })
+      })
+
+      function sortResults(db, prop, asc) {
+        return db.sort(function(a,b) {
+          if(asc) {
+            return (a[prop] > b[prop]) ? 1 : ((a[prop] < b[prop]) ? -1 : 0);
+          } else {
+            return (b[prop] > a[prop]) ? 1 : ((b[prop] < a[prop]) ? -1 : 0);
+          }
+        })
+      }
+
+      function getTV() {
+       
+        fetch("/manager/gettv")
+        .then(r => r.json())
+        .then(json => {
+          $('#library').html("")
+          var content = ''
+
+          var series_names = []
+          for(var series in json) {
+            for(var season in json[series]) {
+              var show_entry = series.concat(season)
+              if(!series_names.includes(show_entry)) {
+                series_names.push( show_entry )
+                var id = json[series][season][0].id
+                var title = series + " | " + season
+                var poster = json[series][season][0].poster
+                if(poster == undefined) {
+                  poster = "https://picsum.photos/200/300"
+                }
+                content = content + "<div class=\"video-container\">"
+                content = content + "<div class=\"video-poster\">"
+                content = content + "<img src=\""+poster+"\" onClick=\"java:filterTV('"+series+"', '"+season+"');\"/>"
+                content = content + "</div>"
+                content = content + "<div class=\"video-title\">"+title+"</div>"
+                content = content + "<div class=\"video-title\"></div>"
+                content = content + "</div>"
+              }
+            }
+          }
+          $("#library").append(content)
+        })
+      }
+
+      function filterTV(series,season) {
+        $('#btn-tv').addClass('active');
+        $('#btn-movies').removeClass('active');
+        fetch('/manager/medialist')
+        .then(r=>r.json())
+        .then(json=> {
+          $('#library').html("")
+          var content = ''
+          
+          var backdone = false
+
+          // Get List of All Series Names
+          for(var key in json) {
+            if(!backdone) {
+              content = content + "<div class=\"video-container\">"
+              content = content + "<div class=\"video-poster\">"
+              content = content + "<img src=\"back.png\" onclick=\"getTV();\" />"
+              content = content + "</div>"
+              content = content + "<div class=\"video-title\">Go Back</div>"
+              content = content + "</div>"
+              backdone = true
+            }
+            if(json[key].category == "Movies") continue;
+            // match data with selection
+            if( (series == json[key].series) && (season == json[key].season) ) {
+              var id = json[key].id
+              var title = json[key].title
+              var poster = json[key].poster
+              if(poster == undefined) {
+                poster = "https://picsum.photos/200/300"
+              }
+              content = content + "<div class=\"video-container\">"
+              content = content + "<div class=\"video-poster\">"
+              content = content + "<img src=\""+poster+"\" onClick=\"loadMedia("+id+");\"/>"
+              content = content + "</div>"
+              content = content + "<div class=\"video-title\">"+title+"</div>"
+              content = content + "</div>"
+            }
+            
+          }
+          $("#library").append(content)
+        })
+      }
+      function getMovies() {
+        fetch('/manager/medialist')
+        .then(r=>r.json())
+        .then(json=> {
+          $('#btn-tv').removeClass('active');
+          $('#btn-movies').addClass('active');
+          $('#library').html("")
+          content = ''
+          for(var key in json) {
+            if(json[key].category == "Movies") {
+              var id = json[key].id
+              var title = json[key].title
+              var poster = json[key].poster
+              if(poster == undefined) {
+                poster = "https://picsum.photos/200/300"
+              }
+              content = content + "<div class=\"video-container\">"
+              content = content + "<div class=\"video-poster\">"
+              content = content + "<img src=\""+poster+"\" onClick=\"loadMedia("+id+");\"/>"
+              content = content + "</div>"
+              content = content + "<div class=\"video-title\">"+title+"</div>"
+              content = content + "<div class=\"video-title\"></div>"
+              content = content + "</div>"
+            }
+          }
+          $("#library").append(content)
+        })
+      }
+      function loadMedia(id) {
+        var videoID = 'rpiediaPlayer';
+        var sourceID = 'mp4video';
+        var newmp4 = '/media/'+id;
+        // Get the document offset :
+        var offset = $(document).scrollTop()
+
+        // Get the window viewport height
+        viewportHeight = $(window).height()
+
+        // cache your dialog element
+        var myDialog = $('#video-window');
+
+        // now set your dialog position
+          myDialog.css('top',  (offset  + (viewportHeight/2)) - (myDialog.outerHeight()/2));
+          $("#video-window").removeClass("is-hidden").show();
+          $('#rpiediaPlayer').get(0).pause();
+          $('#rpiediaSource').attr('src', newmp4);
+          $('#rpiediaPlayer').get(0).load();
+          $('#rpiediaPlayer').get(0).play();
+          // Un Mute If Muted
+          $("#rpiediaPlayer").get(0).muted = false
+      }
+
+    </script>
+  </body>
+</html>

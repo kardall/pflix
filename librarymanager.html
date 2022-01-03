@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PFlix - Library Manager</title>
+    <link rel="stylesheet" href="manager.css">
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"></script>
+      <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  </head>
+  <body>
+    <h1 class="page-header">Library Manager <button onClick="window.open('/','_self');">Library</button></h1>
+    <div class="flex-container">
+      <div id="menu">
+        
+      </div>
+      <div id="media">
+        <div class="form-media">
+          <form id="current-media-data">
+            <hidden id="media-id" value=""></hidden>
+            <hidden id="media-poster-url" value=""></hidden>
+            <hidden id="media-bg-url" value=""></hidden>
+            
+            <button id="btn-save-media">Save</button>
+            <button id="btn-search-poster">Find Poster</button>
+            <span>Custom Search:</span><input id="media-custom-search" value=""/><label>Series </label><input id="chk-series" type="checkbox"/>
+          </form>
+        </div>
+        <div class="selected-media">
+          <div class="selected-media-display">
+          <h2 id="media-title"></h2>
+          <div id="media-poster"></div>
+        </div>
+        <div id="search-results">
+            
+        </div>
+      </div>
+      </div>
+    </div>
+    <script type="application/javascript">
+      function SearchPoster() {
+        var mid = $("#media-id").val();
+        var customsearch = $("#media-custom-search").val();
+        if(customsearch == undefined) {
+          customsearch = null
+        }
+
+        if($("#chk-series").prop('checked')) {
+          // Series Check
+          fetch("/manager/poster/series", {
+            method: 'POST',
+            headers: {
+              'Content-Type':'application/json'
+            },
+            body: JSON.stringify({"id": mid, "custom":customsearch})
+          })
+          .then(x => x.json())
+            .then(dbres => {
+              // Original Code Just Movies
+              $("#search-results").text("")
+              if(dbres.length === 0) {
+                alert("No Matches Found...")
+                return
+              }
+              for(var result in dbres) {
+                var mid = $("#media-title").val();
+                var bgurl = "https://image.tmdb.org/t/p/w300"+dbres[result].backdrop_path;
+                var poster = "https://image.tmdb.org/t/p/w300"+dbres[result].poster_path;
+                var tvtitle = $("#media-title").text()
+                var origtitle = dbres[result].original_title === undefined ? dbres[result].original_name : dbres[result].original_title;
+                origtitle = origtitle.replace(/[\/\(\)\']/g, "");
+                if(dbres[result].poster_path == undefined) {
+                  poster = "https://picsum.photos/300/450";
+                }
+                $("#search-results").append("<div class=\"search-entry\"><div class=\"search-entry__header\">"+origtitle+"</div><img src="+poster+" onClick=\"setMedia(this,'"+bgurl+"','"+poster+"','"+tvtitle+"');\" alt=\"Poster For "+mid+"\"/></div>");
+              }
+            });
+        } else {
+          fetch("/manager/poster", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({"id": mid, "custom": customsearch })
+            })
+            .then(x => x.json())
+            .then(dbres => {
+              // Original Code Just Movies
+              $("#search-results").text("")
+              if(dbres.length === 0) {
+                alert("No Matches Found...")
+                return
+              }
+              
+              for(var result in dbres) {
+                var mid = $("#media-title").val();
+                var bgurl = "https://image.tmdb.org/t/p/w300"+dbres[result].backdrop_path;
+                var poster = "https://image.tmdb.org/t/p/w300"+dbres[result].poster_path;
+                var origtitle = dbres[result].original_title === undefined ? dbres[result].original_name : dbres[result].original_title;
+                origtitle = origtitle.replace(/[\/\(\)\']/g, "");
+                if(dbres[result].poster_path == undefined) {
+                  poster = "https://picsum.photos/300/450";
+                }
+                $("#search-results").append("<div class=\"search-entry\"><div class=\"search-entry__header\">"+origtitle+"</div><img src="+poster+" onClick=\"setMedia(this,'"+bgurl+"','"+poster+"','"+origtitle+"');\" alt=\"Poster For "+mid+"\"/></div>");
+              }
+          });
+        }
+      }
+
+      function showMediaDetails(media_id) {
+        $("#search-results").html("")
+        fetch('/manager/medialist')
+        .then(r=>r.json())
+        .then(json=> {
+          for(var mid in json) {
+            if(json[mid].id == media_id) {
+              $("#media-id").val(media_id)
+              $("#media-title").text(json[mid].title)
+              $("#media-poster").html("<img src=\""+json[mid].poster+"\" alt=\"Poster for "+json[mid].title+"\"/>")
+              $("#btn-search-poster").prop('disabled', false)
+            }
+          }
+        })
+      }
+      function setMedia(e, bgurl,poster, origtitle) {
+          $("#media-poster-url").val(poster);
+          $("#media-bg-url").val(bgurl);
+          $("#media-title").val(origtitle);
+          $('.search-entry .highlight').not(this).removeClass('highlight');
+          $(e).toggleClass('highlight');
+          $("#btn-save-media").prop('disabled', false)
+        }
+      function getMediaList() {
+        $("#menu").html("")
+        
+        var content = '<div class="menu-container">'
+        fetch('/manager/gettv')
+        .then(r=>r.json())
+        .then(json=> {
+          for(var series in json) {
+            content = content + "<details open class=\"t1\"><summary>"+series+"</summary>"
+            for(var season in json[series]) {
+              content = content + "<details class=\"t2\"><summary>"+season+"</summary>"
+              json[series][season].map(ep => {
+                content = content + "<div onClick=\"showMediaDetails('"+ep.id+"');\">"+ep.title+"</div>"
+              })
+              content = content + "</details>"
+            }
+            content = content + "</details>"
+          }
+          fetch("/manager/getmovies")
+          .then(s => s.json())
+          .then(json2 => {
+            for(var i=0;i<json2.length;i++) {
+              var movie = json2[i]
+              if(movie.poster == "/no-poster-available.jpg") {
+                content = content + "<div class=\"info-missing\" onClick=\"showMediaDetails('"+movie.id+"');\">"+movie.title+"</div>"
+              } else {
+                content = content + "<div onClick=\"showMediaDetails('"+movie.id+"');\">"+movie.title+"</div>"
+              }
+              
+            }
+            content = content + "</div>"
+            $("#menu").html(content)
+          })
+          
+        })
+        
+        
+        
+      }
+
+      $(document).ready( function() {
+        getMediaList();
+        $("#btn-search-poster").click(function(event) {
+          event.preventDefault();
+          SearchPoster();
+        })
+        $("#btn-search-poster").prop('disabled', true)
+        $("#btn-save-media").prop('disabled', true)
+
+        $("#btn-save-media").click(function(event) {
+          event.preventDefault();
+          var mid = $("#media-id").val();
+          var background = $("#media-bg-url").val();
+          var poster = $("#media-poster-url").val();
+          var title = $("#media-title").val();
+          var seriesChecked = $("#chk-series").prop('checked');
+          var content = {
+                  "id":mid,
+                  "background":background,
+                  "poster":poster,
+                  "title":title,
+                  "isSeries":seriesChecked
+          }
+          content = JSON.stringify(content)
+          fetch("/manager/update", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: content
+          })
+          .then(x => {
+            if(x.status == 200) {
+              
+              $("#search-results").text("")
+              $("#media-title").text("");
+              $("#media-id").val("")
+              $("#media-poster").html("")
+              $("#media-custom-search").val("")
+              getMediaList();
+            }
+          })
+          .catch(err => console.log(err))
+          
+        })
+      })
+    </script>
+  </body>
+  
+</html>

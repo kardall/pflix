@@ -1,0 +1,101 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap");
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  
+  body {
+    background: #1f1f1f;
+    font-family: "Roboto", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+.menu {
+  padding: 0.2em;
+  
+}
+.active {
+  border: 2px solid rgb(255, 255, 255);
+}
+.menu button {
+  font-size: 1.2em;
+  width: 12vw;
+  padding-block: 0.2em;
+  color:rgb(223, 132, 71);
+  background-color:#464646;
+}
+.menu button:hover {
+  background-color: #5a5a5a;
+}
+  #library {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .video-container {
+    width: 10em;
+    transition: transform .2s;
+    margin: 0.125em 1em 0.125em 1em;
+    background-color: #000;
+  }
+  .video-container:hover {
+    transform: scale(1.1);
+    border: 1px solid rgb(223, 132, 71);
+  }
+
+  .video-poster {
+    margin: 0;
+    padding: 0;
+    
+  }
+
+  .video-poster img {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .video-title {
+    width: 100%;
+    margin-top: 0px;
+    background-color: #000;
+    color: white;
+    text-align: center;
+  }
+  /* Video Window */
+  .is-hidden { visibility: hidden; }
+
+  #video-window {
+    position: absolute;
+    max-width: 75vw;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5000;
+  }
+  
+  #video-window > * {
+    width: 100%;
+  }
+  
+
+  #video-close {
+    width: 100%;
+    z-index: 1200;
+  }

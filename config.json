@@ -1,0 +1,27 @@
+{
+    "port":8000,
+    "api_key":"<tmdb API key>",
+    "users": {
+        "admin":"changeme"
+    },
+    "folders":[
+        {
+            "root":"C:/Videos/Movies",
+            "category":0
+        },
+        {
+            "root":"C:/Videos/TV",
+            "category":1
+        }
+    ],
+    "categories": [
+        {
+            "category":0,
+            "name":"Movies"
+        },
+        {
+            "category":1,
+            "name":"TV"
+        }
+    ]
+}

@@ -1,0 +1,129 @@
+:root {
+    --clr-bg: rgb(10, 0, 36);
+    --clr-primary: rgb(224, 208, 178);
+    --clr-hover: rgb(180, 197, 124);
+    --clr-bg-hover: rgb(31, 0, 109);
+}
+* { margin: 0; padding: 0; }
+body {
+    background-color: var(--clr-bg);
+    color: var(--clr-primary);
+}
+.page-header {
+    margin-bottom: 0.25em;
+    width: 40em;
+    border-bottom: 1px solid var(--clr-primary);
+}
+
+.flex-container {
+  display: flex;
+}
+
+#media {
+  display: flex;
+  flex-basis: 100%;
+  flex-direction: column;
+}
+.season-header {
+  font-size: 1.2em;
+}
+#menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 20em;
+  max-width: 20em;
+
+}
+
+.selected-media {
+  display: flex;
+}
+
+.selected-media-display {
+  display: flex;
+  flex-direction: column;
+}
+.menu-container {
+      padding: 1em;
+      overflow-y: auto;
+      width: 18em;
+      max-height: 40em;
+}
+.menu-container ul {
+      list-style: none;
+      width: 100%;
+      font-size: 1.25rem;
+}
+.menu-container ul li {
+      color: var(--clr-primary);
+      width: 100%;
+}
+.menu-container ul li:hover {
+    background-color: var(--clr-bg-hover);
+}
+.menu-container ul li a,
+.menu-container ul li a:visited {
+    color: var(--clr-primary);
+    text-decoration: none;
+}
+.menu-container ul li a:hover {
+      color: var(--clr-hover);
+}
+
+#search-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5em;
+  row-gap: 5em;
+  flex-direction: row;
+  margin: 2em;
+}
+
+.search-entry {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    max-width: 170px;
+    height: 200.1px;
+    transition: background-color 0.25s linear;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    background-size: cover;
+}
+
+  .search-entry__header {
+      position: relative;
+      top: 1.5em;
+      left: 0;
+      width: 100%;
+      background-color: rgba(0,0,0,0.85);
+  }
+
+  .highlight {
+      border: 1px solid rgb(47, 207, 7);
+  }
+  .info-missing::before {
+    content: "*";
+    color: rgb(221, 169, 0);
+  }
+
+  summary > * {
+    display: block;
+    
+  }
+
+  details.t1 {
+    margin-left: 5px;
+  }
+
+  details.t2 {
+    margin-left: 10px;
+  }
+
+  #menu > div > details > details > div {
+    margin-left: 20px;
+  }
+
+  #menu > div > details > details > div:hover {
+    background-color:rgb(31, 0, 109);
+  }

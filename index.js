@@ -138,8 +138,6 @@ app.get("/manager/gettv", async (req,res) => {
 app.get("/manager/scan", async (req,res) => {
   
   var db = JSON.parse(fs.readFileSync(__dirname + "/videos.json"))
-  var id = HighestID(db)
-
   for(var i=0;i<cfg.folders.length;i++) {
     var cat = getCategoryNameById(cfg.folders[i].category)
     if(cat == "Movies") {
@@ -147,6 +145,7 @@ app.get("/manager/scan", async (req,res) => {
       .then(files => {
         for(var i=0; i<files.length;i++) {
           if(!VideoExists(db,files[i])) {
+            var id = HighestID(db) + 1;
             db.push({
               "id":id,
               "path":files[i],
@@ -174,7 +173,7 @@ app.get("/manager/scan", async (req,res) => {
             var fLen = path_structure.length
             var season = path_structure[fLen-2]
             var show = path_structure[fLen-3]
-            
+            var id = HighestID(db) + 1;
             db.push({
               "id":id,
               "path":files[i],
